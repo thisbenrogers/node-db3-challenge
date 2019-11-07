@@ -4,9 +4,9 @@ module.exports = {
   find,
   findById,
   findSteps,
-  add
-  // update,
-  // remove
+  add,
+  update,
+  remove
 }
 
 
@@ -28,7 +28,22 @@ function findSteps(id) {
     .orderBy("step_number")
 }
 
-function add(scheme) {
-  return db("schemes")
-    .insert(scheme)
+async function add(scheme) {
+  const [id] = await db('schemes').insert(scheme, 'id');
+  return findById(id);
+}
+
+async function update(changes, id) {
+  await db('schemes')
+    .where({ id })
+    .update(changes, 'id');
+  return findById(id);
+}
+
+async function remove(id) {
+  const removedScheme = await findById(id)
+  const removed = await db("schemes")
+    .where({ id })
+    .del();
+  return removed ? removedScheme : null;
 }
